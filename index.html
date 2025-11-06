@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리버렐리오 공증 계산기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            color: #667eea;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .formula {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e0e0e0;
+            color: #888;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>리버렐리오 공증 계산기</h1>
+
+        <div class="input-group">
+            <label for="blackLotusAttack">흑련 공격력</label>
+            <input type="number" id="blackLotusAttack" placeholder="예: 1000" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label for="blackLotusBoost">흑련 공증 (%)</label>
+            <input type="number" id="blackLotusBoost" placeholder="예: 50" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label for="liberalioAttack">리버렐리오 공격력</label>
+            <input type="number" id="liberalioAttack" placeholder="예: 800" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <label style="display: flex; align-items: center; cursor: pointer;">
+                <input type="checkbox" id="ritaCheck" style="width: auto; margin-right: 10px; cursor: pointer;">
+                리타 적용
+            </label>
+        </div>
+
+        <button onclick="calculate()">계산하기</button>
+
+        <div class="result" id="result">
+            <div class="result-label">리버렐리오 공증 요구치</div>
+            <div class="result-value" id="resultValue">0</div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const blackLotusAttack = parseFloat(document.getElementById('blackLotusAttack').value);
+            const blackLotusBoost = parseFloat(document.getElementById('blackLotusBoost').value);
+            const liberalioAttack = parseFloat(document.getElementById('liberalioAttack').value);
+            const ritaCheck = document.getElementById('ritaCheck').checked;
+
+            // 입력값 검증
+            if (isNaN(blackLotusAttack) || isNaN(blackLotusBoost) || isNaN(liberalioAttack)) {
+                alert('모든 값을 입력해주세요.');
+                return;
+            }
+
+            if (liberalioAttack === 0) {
+                alert('리버렐리오 공격력은 0이 될 수 없습니다.');
+                return;
+            }
+
+            // 계산 (리타 체크 여부에 따라 다른 공식 적용)
+            let result;
+            if (ritaCheck) {
+                result = (((blackLotusAttack * (1 + (blackLotusBoost/100) + 1.1512 + 0.8042)) / liberalioAttack) - 2.6 - 0.8042) * 100;
+            } else {
+                result = (((blackLotusAttack * (1 + (blackLotusBoost/100) + 1.1512)) / liberalioAttack) - 2.6) * 100;
+            }
+
+            // 음수인 경우 0으로 처리
+            if (result < 0) {
+                result = 0;
+            }
+
+            // 결과 표시
+            document.getElementById('resultValue').textContent = result.toFixed(2) + '%';
+            document.getElementById('result').classList.add('show');
+        }
+
+        // Enter 키로 계산 실행
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    calculate();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
